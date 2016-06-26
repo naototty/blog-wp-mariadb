@@ -1,0 +1,60 @@
+version: "2"
+services:
+  wp_web_data:
+    image: python:2.7-alpine
+    volumes:
+      - /opt/datastore:/var/www/html
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - wp_db
+      - wp_web_data
+    volumes_from:
+      - wp_web_data
+    links:
+      - wp_db:3306
+    ports:
+      - "80:80"
+##    environment:
+##      WORDPRESS_DB_HOST: wp_db:3306
+    env_file: .env
+  wp_db:
+    image: mysql
+    container_name: "wp_db"
+    restart: always
+    volumes:
+      - "db-data:/var/lib/mysql"
+    env_file: .env
+    environment:
+      - TERM=xterm
+##    ports:
+##      - "127.0.0.1:3306:3306"
+##    ports:
+##      - "3306:3306"
+##    networks:
+##      - flat-network
+##    env_file: .env
+##  mariadb:
+##    image: mariadb
+##    container_name: "mariadb"
+##    env_file: .env
+##    environment:
+##      - TERM=xterm
+##    ports:
+##      - "127.0.0.1:3306:3306"
+##    volumes:
+##      - "db-data:/var/lib/mysql"
+##   phpmyadmin:
+##     image: phpmyadmin/phpmyadmin
+##     container_name: myadmin
+##     links:
+##       - wp_db:db
+##     volumes:
+##       - /sessions
+##     ports:
+##       - "8888:80"
+##     env_file: .env
+volumes:
+  db-data:
